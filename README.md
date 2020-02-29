@@ -9,7 +9,7 @@ Check out [Collocations Finder](https://collocations-finder.appspot.com/) to lea
 ## Installation
 
 ```bash
-pip install collocater
+pip install collocater --no-deps
 ```
 
 ## Usage

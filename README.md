@@ -1,1 +1,1 @@
-# collocater
+This is the description of the collocater package.

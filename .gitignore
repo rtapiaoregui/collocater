@@ -1,5 +1,9 @@
 # Compiled source #
 ###################
+/collocater.egg-info/*
+/build/*
+/dist/*
+**/.eggs
 *.com
 *.class
 *.dll

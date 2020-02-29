@@ -1,6 +1,6 @@
 # Collocater 
 
-Collocater is a Python library for retrieving the collocations to be found in a message. The ontology it operates on has been scraped from the [Online OXFORD Collocation Dictionary](http://www.freecollocation.com/search?word=machine.)
+Collocater is a Python library for retrieving the collocations to be found in a message. The ontology it operates on has been scraped from the [Online OXFORD Collocation Dictionary](http://www.freecollocation.com/search?word=machine).
 
 Collocater can be added as a pipeline component to Spacy's preprocessing pipeline, so that a messages' collocations can be retrireved the same way its named entities can.
 

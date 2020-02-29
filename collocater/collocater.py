@@ -135,6 +135,7 @@ class Collocater():
             self.tags_dict = tags_dict
             
     
+    
     def loader(path=None):
         """
         Determines where the file is supposed to be found and loads it.
@@ -147,6 +148,7 @@ class Collocater():
                 obj = joblib.load(fh)      
                 
         return obj
+    
     
             
     def saver(self, path):

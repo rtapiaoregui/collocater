@@ -16,8 +16,9 @@ setup(
     author = "Rita Tapia Oregui",
     author_email = "rtapiaoregui@gmail.com",
     description = ("Package for retrieving collocations from text with Spacy"),
+    long_description_content_type="text/markdown",
     keywords = "Collocations Finder",
-    url = "https://collocations-finder.appspot.com/",
+    url = "https://github.com/rtapiaoregui/collocater",
     packages=['collocater'],
     long_description=open(os.path.join(os.path.dirname(__file__), 'README.md')).read(),
     install_requires=[

@@ -30,7 +30,11 @@ from spacy.matcher import PhraseMatcher
 from spacy.tokens import Span
 
 
-def store_collocs_in_df(found_colls_dict, out_format='df'):
+
+def store_collocs_in_df(found_colls_dict):
+    """
+    Function to transform the output of the Collocater class into a data frame.
+    """
     
     df_colls = pd.DataFrame(found_colls_dict).T
     
@@ -77,27 +81,23 @@ def store_collocs_in_df(found_colls_dict, out_format='df'):
     
             
 
-def collocations_linker(text, found_collocations, color="#bf6a00"):
+def collocations_linker(text, found_collocations, color="rgb(255, 158, 0, 0.4)"):
+    """
+    Function to transform the text where collocations are meant to be found 
+    into a string with html tags to highlight the collocations found.
+    """
 
     all_colls = found_collocations.keys()
         
     all_colls1 = sorted(all_colls, key=len)[::-1]
-    regex_wrapper = '(?<=[\W_])({0})(?=[\W_])|^({0})(?=[\W_])|(?<=[\W_])({0})$'
     
     for col in all_colls1:
-        text = regex.sub(regex.compile(regex_wrapper.format(regex.escape(col))), '_'.join(col.split()), text)
-        
-    html_processed_linked_text = regex.sub(r'_', ' ',
-                                           regex.sub(u'üü', '-', 
-                                                     regex.sub(r'(?<=_\w+)(?:\b)', '</font>', 
-                                                               regex.sub(r'(?:\b)(?=\w+_)', f'<font color="{color}">', 
-                                                                         regex.sub(r'(?<=\w)\-(?=\w)', 'üü', text)))))
+        text = regex.sub(r'(?<='+f'{regex.escape(col)})'+r'(?:\b)', '</span>', regex.sub(r'(?:\b)(?='+f'{regex.escape(col)})', f'<span style="background-color: {color}">', text))
+
+    return text
     
     
-    return html_processed_linked_text
-    
-    
-    
+  
     
 
 class Collocater():
@@ -152,14 +152,14 @@ class Collocater():
     
             
     def saver(self, path):
-  
+        """
+        Saves the Collocater Object in the specified file.
+        """
         with open(path, 'wb') as fh:
             joblib.dump(self, fh)  
                   
     
-    
     def _get_proxies(url):
-        
         """
         Function meant to provide different proxies 
         to scrape the website of the url provided as input.
@@ -189,7 +189,6 @@ class Collocater():
     
     
     def _looper(x, function, **kwargs):
-        
         """
         Wrapper function to apply the function passed as input to the list of words x 
         and return a regular expression with all the different ways in which
@@ -204,7 +203,6 @@ class Collocater():
     
                 
     def _verbal_regulater(a, irr_vbs):
-        
         """
         Function to turn a verbal infinitive into a regular expression pattern 
         that matches all the declinations of that verb.
@@ -242,7 +240,6 @@ class Collocater():
     
     
     def _adject_regulater(a):
-        
         """
         Function to turn an adjective into a regular expression pattern 
         that matches all the variant inflected forms of that adjective.
@@ -266,7 +263,6 @@ class Collocater():
     
     
     def _noun_regulater(a):
-        
         """
         Function to turn a common noun into a regular expression pattern 
         that matches all the variant inflected forms of that noun.
@@ -305,7 +301,6 @@ class Collocater():
     
     
     def _alternatives_disassembler(x):
-        
         """
         Function to split up the different ways in which collocations that can be considered 
         semantically equivalent appear written, so that they become different entries.
@@ -333,7 +328,6 @@ class Collocater():
                     
               
     def _alts_diss(x):
-            
         """
         Function to split up the different ways in which collocations that can be considered 
         semantically equivalent appear written, so that they become different entries.
@@ -368,7 +362,7 @@ class Collocater():
         Parameters:
             x (str): Raw content
             tags_dict (dict): Python dictionary to replace the references to pronouns 
-                and other non-fixed discoursive variables that don't refer to 
+                and other non-set discoursive variables that don't refer to 
                 collocations with traceable tags.
         """
         
@@ -386,6 +380,7 @@ class Collocater():
                                                                                                                             regex.sub(r'\([^\)]{23,}\)', '', 
                                                                                                                                      regex.sub(r'<.?\w>', '', ' '+ x + ' ')))))))))))))
     
+        
     def _colls_processor(without_examples, tags_dict):
         """
         Function to process the raw content retrieved from the Online Oxford Dictionary's 
@@ -396,7 +391,7 @@ class Collocater():
             without_examples (str): Raw content, bereft of the cursive strings, 
                 which stand for the examples given for each collocation.
             tags_dict (dict): Python dictionary to replace the references to pronouns 
-                and other non-fixed discoursive variables that don't refer to 
+                and other non-set discoursive variables that don't refer to 
                 collocations with traceable tags.
             
         Returns:
@@ -420,17 +415,12 @@ class Collocater():
         return singletons
     
         
-    
-        
     def collocate(self, word, verbose=False):
         """
         Scrapes the Online Oxford Collocation Dictionary to extract collocations.
         
         Parameters:
             word (str): The word to be queried in the Online Oxford Collocation Dictionary.
-            tags_dict (dict): Python dictionary to replace the references to pronouns 
-                and other non-fixed discoursive variables that don't refer to 
-                collocations with traceable tags.
             verbose (bool): Optional argument to print message out to screen when collocations 
                 could not be found for the word provided as input.
             
@@ -505,7 +495,6 @@ class Collocater():
         self.collocations_dictionary[word] = collocations
         
         return collocations
-    
     
     
     def collocations_identifier(self, word, morpho, text):
@@ -693,6 +682,26 @@ class Collocater():
                 
     
     def __call__(self, doc):
+        """
+        Retrieves, from the type of collocations it's instructed to look for,
+        the collocations that could be found for either verbs, 
+        nouns or both in the inputted text, and returns either a dictionary
+        with the collocations found in the text or the text parsed by Spacy 
+        with its added collocations finder component.
+        
+        Parameters:
+            doc (str/spacy.tokens.doc.Doc): The text whose collocations are meant to be found.
+                
+        Returns:
+            when the input is a spacy.tokens.doc.Doc:
+                doc (spacy.tokens.doc.Doc): The inputted text with the collocations 
+                    found in them added to them in the token and span level of 
+                    Spacy's added component.
+            when the input is a string:
+                found_colls_dict (dict): Python dictionary with the collocations found as keys, 
+                    and, as values, the positions of their first and last tokens and 
+                    the morphology of both of the collocations' word component 
+        """
         
         nlp = spacy.load(self.spacy_model, disable=['ner'])
 
@@ -762,9 +771,8 @@ class Collocater():
 
 if __name__ == '__main__':
     
-    my_file = "/Users/rita/Google Drive/collocator/collocations_dict_scraper.py"
     
-    data_path = os.path.join(os.path.dirname(my_file), 'data')
+    data_path = os.path.join(os.path.dirname(__file__), 'data')
     entire_class_path = os.path.join(data_path, 'collocater_obj.joblib')
     prep_path = os.path.join(data_path, 'prepositions.joblib')
     irr_verbs_path = os.path.join(data_path, 'irr_verbs_dict.joblib')
@@ -849,15 +857,15 @@ if __name__ == '__main__':
     
     found_collocations = collie(text)
     found_collocations1 = collie(nlp(text))
-#    found_collocations2 = collie(wrong_doc)
     
     print(f"\nOutput of collie(text) with text as a str:\n")
     pprint(found_collocations)
     
-    colls_df = store_collocs_in_df(found_collocations)
-    print(f"\nFirst row of the dataframe with all collocations found:\n")
-    print(colls_df.iloc[0])
-    
+    if found_collocations:
+        colls_df = store_collocs_in_df(found_collocations)
+        print(f"\nFirst row of the dataframe with all collocations found:\n")
+        print(colls_df.iloc[0])
+        
     print("\n\nTokens with associated collocations:\n")
     pprint([(col.orth_, col._.colloc) for col in found_collocations1 if col._.colloc])
     
@@ -867,6 +875,9 @@ if __name__ == '__main__':
     
     print("\n\nList of all the collocations found:\n")
     print(found_collocations1._.collocs)
+    
+    collie.saver(entire_class_path)
+
     
     
     

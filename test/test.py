@@ -6,9 +6,9 @@ Created on Fri Feb 21 10:21:27 2020
 @author: rita
 """
 
-import pytest, os, joblib
-import unittest, regex
-from collocater import Collocater, store_collocs_in_df, collocations_linker
+import pytest, os
+import regex
+from collocater.collocater import Collocater, store_collocs_in_df
 import spacy
 
 
@@ -16,14 +16,6 @@ import spacy
 
 @pytest.fixture
 def test_datafinder():
-
-    my_file = "/Users/rita/Google Drive/collocator/test.py"
-    
-    data_path = os.path.join(os.path.dirname(my_file), 'data')
-    entire_class_path = os.path.join(data_path, 'collocater_obj.joblib')
-    prep_path = os.path.join(data_path, 'prepositions.joblib')
-    irr_verbs_path = os.path.join(data_path, 'irr_verbs_dict.joblib')
-    colls_dict_path = os.path.join(data_path, 'collocations_dict.joblib')
     
     spacy_model = 'en_core_web_sm'
 
@@ -73,13 +65,7 @@ def test_datafinder():
                 'convert': "He tried to convert him from paganism to Catholicism."
                 }
     
-    data_pack = {'my_file': my_file, 
-                 'data_path': data_path, 
-                 'entire_class_path': entire_class_path, 
-                 'prep_path': prep_path, 
-                 'irr_verbs_path': irr_verbs_path,
-                 'colls_dict_path': colls_dict_path, 
-                 'spacy_model': spacy_model, 
+    data_pack = {'spacy_model': spacy_model, 
                  'examples': examples, 
                  'word': 'eye'}
     
@@ -89,21 +75,7 @@ def test_datafinder():
 
 @pytest.fixture
 def test_loader(test_datafinder):
-
-    try:
-        collie = Collocater.loader(test_datafinder.get('entire_class_path'))
-    except:
-        with open(test_datafinder.get('irr_verbs_path'), 'rb') as fh:
-            irr_verbs = joblib.load(fh)
-            
-        with open(test_datafinder.get('prep_path'), 'rb') as fh:
-            prepositions = joblib.load(fh)
-
-        with open(test_datafinder.get('colls_dict_path'), 'rb') as fh:
-            collocations_dictionary = joblib.load(fh)
-            
-        collie = Collocater(irr_verbs, prepositions, 
-                                 collocations_dictionary=collocations_dictionary)
+    collie = Collocater.loader()
     
     return collie
 
@@ -278,16 +250,17 @@ def test_spacy_colls_component(test_datafinder, test_collocater_out):
        
        
     
-def test_collocater_saver(test_datafinder, test_loader):
+def test_collocater_saver(test_datafinder, test_loader, tmp_path):
     
-    path = test_datafinder.get('entire_class_path')
+    path = os.path.join(tmp_path,'tmp.joblib')
     
     if os.path.exists(path):
         os.remove(path)
 
-    test_loader.saver(test_datafinder.get('entire_class_path'))
+    test_loader.saver(path)
 
     assert os.path.exists(path)
+    os.remove(path)
 
 
 def test_store_in_df(test_collocater_out):

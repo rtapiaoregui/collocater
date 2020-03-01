@@ -12,7 +12,7 @@ from setuptools import setup
 
 setup(
     name = "collocater",
-    version = "0.1",
+    version = "0.2",
     author = "Rita Tapia Oregui",
     author_email = "rtapiaoregui@gmail.com",
     description = ("Package for retrieving collocations from text with Spacy"),

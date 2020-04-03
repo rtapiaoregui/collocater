@@ -15,7 +15,7 @@ pip install collocater --no-deps
 ## Usage
 
 ```python
-import collocater
+from collocater import collocater
 import spacy
 
 collie = collocater.Collocater.loader()
@@ -27,7 +27,7 @@ doc = nlp(text)
 print(doc._.collocs) # returns [bunch of, bunch of beautiful flowers, beautiful flowers]
 
 #Tokens with associated collocations in text:
-colls = [(col.text, col.start_char, col.end_char, col.label_) for col in found_collocations1._.collocs]
+colls = [(col.text, col.start_char, col.end_char, col.label_) for col in doc._.collocs]
 pprint(colls) # returns [
 #                          ('bunch of', 16, 24, 'bunch_noun__prep'),
 #                          ('bunch of beautiful flowers', 16, 42, 'flower_noun__quant'),

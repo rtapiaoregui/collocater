@@ -17,6 +17,7 @@ pip install collocater --no-deps
 ```python
 from collocater import collocater
 import spacy
+from pprint import pprint
 
 collie = collocater.Collocater.loader()
 nlp = spacy.load('en_core_web_sm')
